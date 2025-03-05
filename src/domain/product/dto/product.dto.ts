@@ -4,6 +4,7 @@ import {
   IsArray,
   IsDefined,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
   ValidateNested,
@@ -34,6 +35,7 @@ export class CreateProductDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ComponentDto)
+  @IsOptional()
   components?: ComponentDto[];
 }
 

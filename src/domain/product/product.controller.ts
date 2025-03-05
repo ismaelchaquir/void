@@ -1,12 +1,32 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/product.dto';
 import { ProductService } from './product.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('products')
+@ApiBearerAuth('authorization')
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }),
+)
+@ApiTags('products')
 export class ProductController {
   constructor(private productService: ProductService) {}
 
-  public async createProduct(dto: CreateProductDto) {
+  @Post()
+  public async createProduct(@Body() dto: CreateProductDto) {
     return await this.productService.createProduct(dto);
   }
 
@@ -15,13 +35,16 @@ export class ProductController {
     return await this.productService.getProductById(id);
   }
 
-  @Get('/:id')
+  @Delete('/:id')
   public async deleteProduct(@Param('id') id: string) {
     return await this.productService.deleteProduct(id);
   }
 
-  @Post('/:id')
-  public async updateProduct(@Param('id') id: string, dto: CreateProductDto) {
+  @Patch('/:id')
+  public async updateProduct(
+    @Param('id') id: string,
+    @Body() dto: CreateProductDto,
+  ) {
     return await this.productService.updateProduct(id, dto);
   }
 }

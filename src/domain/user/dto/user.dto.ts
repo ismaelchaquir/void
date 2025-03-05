@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  ArrayNotEmpty,
-  ArrayUnique,
-  IsArray,
-  IsDefined,
-  IsEnum,
-  IsString,
-} from 'class-validator';
+import { IsDefined, IsString } from 'class-validator';
 
 export enum UserType {
   manager,

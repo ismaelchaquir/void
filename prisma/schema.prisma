@@ -13,36 +13,146 @@ datasource db {
   url      = env("POSTGRES_URI")
 }
 
+// model User {
+//   id           String  @id @default(uuid()) @db.Uuid
+//   name         String
+//   email        String  @unique
+//   password     String
+//   refreshToken String?
+//   roles        Role[]  @relation("UserRoles") // Many-to-many relation between User and Role
+// }
+
+// model Product {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   name        String
+//   description String
+//   price       Decimal @default(0) @db.Decimal(18, 5)
+//   quantity    Decimal @db.Decimal(18, 5)
+//   components  Component[] @relation("ProductComponents")
+//   products    Component[] @relation("ComponentProducts")
+// }
+
+// model Component {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   productId   String  @db.Uuid
+//   componentId String  @db.Uuid
+//   quantity    Decimal @db.Decimal(18, 5)
+//   product     Product @relation("ProductComponents", fields: [productId], references: [id])
+//   component   Product @relation("ComponentProducts", fields: [componentId], references: [id])
+// }
+
+// // Enum definitions
+// enum ResourcePermission {
+//   settings
+//   products
+//   users
+// }
+
+// enum ActionPermission {
+//   read
+//   create
+//   update
+//   delete
+// }
+
+// // Permission model
+// model Permission {
+//   id        String  @id @default(uuid()) @db.Uuid
+//   resource  ResourcePermission
+//   actions   ActionPermission[]
+//   roles     Role[]   @relation("RolePermissions")  // Relation with Role through the join table
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// // Role model
+// model Role {
+//   id          String      @id @default(uuid()) @db.Uuid
+//   name        String
+//   permissions Permission[] @relation("RolePermissions") // Relation with Permission through the join table
+//   users       User[]      @relation("UserRoles") // Many-to-many relation to User
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+// }
+
+// // Join table for many-to-many relationship between Role and Permission
+// model RolePermissions {
+//   roleId      String    @db.Uuid
+//   permissionId String  @db.Uuid
+//   role        Role      @relation(fields: [roleId], references: [id])
+//   permission  Permission @relation(fields: [permissionId], references: [id])
+
+//   @@id([roleId, permissionId])  // Composite primary key for the join table
+// }
+
 model User {
   id           String  @id @default(uuid()) @db.Uuid
   name         String
   email        String  @unique
   password     String
   refreshToken String?
-  type         Role  @default(user)
-}
-
-enum Role {
-  manager
-  user
+  roles        Role[]  @relation("UserRoles")
 }
 
 model Product {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String      @id @default(uuid()) @db.Uuid
   name        String
   description String
-  price       Decimal @default(0) @db.Decimal(18, 5)
-  quantity    Decimal @db.Decimal(18, 5)
+  price       Decimal     @default(0) @db.Decimal(18, 5)
+  quantity    Decimal     @db.Decimal(18, 5)
   components  Component[] @relation("ProductComponents")
   products    Component[] @relation("ComponentProducts")
 }
 
-
 model Component {
   id          String  @id @default(uuid()) @db.Uuid
-  productId   String
-  componentId String
-  quantity    Decimal  @db.Decimal(18, 5)
-  product     Product  @relation("ProductComponents", fields: [productId], references: [id])
-  component   Product  @relation("ComponentProducts", fields: [componentId], references: [id])
+  productId   String  @db.Uuid
+  componentId String  @db.Uuid
+  quantity    Decimal @db.Decimal(18, 5)
+  product     Product @relation("ProductComponents", fields: [productId], references: [id])
+  component   Product @relation("ComponentProducts", fields: [componentId], references: [id])
+}
+
+enum ResourcePermission {
+  products
+}
+
+enum ActionPermission {
+  read
+  create
+  update
+  delete
+}
+
+model Permission {
+  id        String             @id @default(uuid()) @db.Uuid
+  resource  ResourcePermission
+  actions   ActionPermission[]
+  roles     Role[]             @relation("RolePermissions")
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  // Added back-relation field
+  rolePermissions RolePermissions[]
+}
+
+model Role {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  permissions Permission[] @relation("RolePermissions")
+  users       User[]       @relation("UserRoles")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Added back-relation field
+  rolePermissions RolePermissions[]
+}
+
+model RolePermissions {
+  roleId       String     @db.Uuid
+  permissionId String     @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
 }

@@ -8,8 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
-import { SignInDto, SignUpDto } from './dto';
-import { Tokens } from '../shared/types';
+import { SignInDto } from './dto';
 import { Public } from 'src/common/decorators';
 import { AuthService } from './auth.service';
 import { RefreshTokenGuard } from 'src/common/guards';
@@ -19,14 +18,6 @@ import { Response } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-
-  // @Public()
-  // @Post('local/signup')
-  // @HttpCode(HttpStatus.CREATED)
-  // signupLocal(@Res() res: Response, @Body() dto: SignUpDto): Promise<any> {
-  //   console.log('body', dto);
-  //   return this.authService.signUpLocal(res, dto);
-  // }
 
   @Public()
   @Post('local/signin')

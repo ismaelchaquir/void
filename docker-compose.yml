@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  postgres-void:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: development_pass
+      POSTGRES_DB: void
+    ports:
+      - 5432:5432
+    volumes:
+      - void_data:/data/postgres
+
+volumes:
+  void_data:
